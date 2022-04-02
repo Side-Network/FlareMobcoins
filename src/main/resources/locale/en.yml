@@ -1,0 +1,45 @@
+prefix: "<GRADIENT:#FF8008-#FFC837>TMMobcoins</GRADIENT> &7\u00BB&f"
+
+basic:
+  no_permission: "%pl_prefix% &cYou don't have permission."
+  some_error: "%pl_prefix% &fYou encountered an error."
+  player_not_found: "%pl_prefix% &fPlayer not found."
+  only_player: "%pl_prefix% &fThis command can be executed only in game."
+
+commands:
+  reload:
+    success: "%pl_prefix% &fPlugin was reloaded from files."
+    mysql: "%pl_prefix% &fThe database connection was reestablished."
+    commands: "%pl_prefix% &fCommands and menus was reloaded."
+  give:
+    help: '%pl_prefix% &fPlease use &#F09819"/mobcoins give [player] [amount]"&f.'
+    success: "%pl_prefix% &fYou gave &#F09819%pl_mobcoins%&f to %pl_player%."
+    received: "%pl_prefix% &fYou received &#F09819%pl_mobcoins% &fmobcoins&f."
+  pay:
+    help: '%pl_prefix% &fPlease use &#F09819"/mobcoins pay [player] [amount]"&f.'
+    success: "%pl_prefix% &fYou payed &#F09819%pl_mobcoins% &fto %pl_player%."
+    received: "%pl_prefix% &fYou received &#F09819%pl_mobcoins% &fmobcoins &ffrom %pl_player%."
+    fail:
+      no_money: "%pl_prefix% &fYou don`t have &#F09819%pl_mobcoins%&f."
+  set:
+    help: '%pl_prefix% &fPlease use &#F09819"/mobcoins set [player] [amount]"&f.'
+    success: "%pl_prefix% &fYou have set %pl_player% &fmobcoins to &#F09819%pl_mobcoins%&f."
+    received: "%pl_prefix% &fYou received &#F09819%pl_mobcoins% &fmobcoins&f."
+  remove:
+    help: '%pl_prefix% &fPlease use &#F09819"/mobcoins remove [player] [amount]"&f.'
+    success: "%pl_prefix% &fYou have removed &#F09819%pl_mobcoins% &fmobcoins from %pl_player%."
+    received: "%pl_prefix% &fYou got removed &#F09819%pl_mobcoins% &fmobcoins from your wallet."
+  balance:
+    help: '%pl_prefix% &fPlease use &#F09819"/mobcoins balance [player]"&f.'
+    player: "%pl_prefix% &fYou have &#F09819%pl_mobcoins% &fmobcoins in your wallet."
+    otherplayer: "%pl_prefix% &fThe player %pl_player% has &#F09819%pl_mobcoins% &fmobcoins in his wallet."
+  multiplier:
+    errors:
+      cant_be: "%pl_prefix% &cSorry.. &fbut the multiplier to &c0&f."
+    set:
+      help: '%pl_prefix% &fPlease use &#F09819"/mobcoins multiplier set [player] [value]"&f.'
+      player: "%pl_prefix% &fYou got now a &#F09819%pl_multiplier% multiplier."
+      otherplayer: "%pl_prefix% &fYou have set a &#F09819%pl_multiplier% multiplier for %pl_player%."
+    global:
+      help: '%pl_prefix% &fPlease use &#F09819"/mobcoins multiplier global [value]"&f.'
+      success: "%pl_prefix% &fYou have set the entire server multiplier to &#F09819%pl_multiplier%."

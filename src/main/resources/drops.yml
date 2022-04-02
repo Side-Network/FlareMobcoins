@@ -1,0 +1,15 @@
+# Here you can configure the mob drops
+
+# Read more here: https://mobcoins.devtm.net/drops/get-started
+
+entity:
+#  ZOMBIE:
+#    drop_value: random_decimal(1;10)
+#    drop_action:
+#      - "[MOBCOINS] give;%pl_mobcoins%"
+#      - "[TITLE] You got;%pl_range%"
+#  SKELETON:
+#    drop_value: random_number(1;10)
+#    drop_action:
+#      - "[MOBCOINS] give;%pl_range%"
+#      - "[TITLE] You got;%pl_range%"
