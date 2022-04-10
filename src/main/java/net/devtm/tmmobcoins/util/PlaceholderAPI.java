@@ -37,6 +37,8 @@ public class PlaceholderAPI extends PlaceholderExpansion {
             return "";
         if (params.contains("get_mobcoins"))
             return String.valueOf(TMMobCoins.PLUGIN.getUtils().getMobCoinsInDelay(p.getUniqueId()));
+        else if (params.contains("multiplier"))
+            return String.valueOf(TMMobCoins.PLUGIN.getUtils().getMultiplierInDelay(p.getUniqueId()));
         return null;
     }
 

@@ -23,7 +23,7 @@ public class MobCoinsPlayer {
     }
 
     public void removeMobcoins(double amount) {
-        this.mobcoins =  Double.parseDouble(String.format("%.2f",amount - mobcoins));
+        this.mobcoins =  Double.parseDouble(String.format("%.2f",mobcoins - amount));
     }
 
     public void addMobcoins(double amount) {

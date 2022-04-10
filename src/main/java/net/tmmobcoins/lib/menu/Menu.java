@@ -57,17 +57,18 @@ public class Menu {
     }
 
     public void assignItems(ItemHandler item) {
-        if(item.slot.size() == 1) {
-            if(item.slot.get(0) != -1) {
-                menuContent.put(item.slot.get(0), item);
-            } else {
-                fillInventory(item);
+        if(!item.slot.isEmpty())
+            if(item.slot.size() == 1) {
+                if(item.slot.get(0) != -1) {
+                    menuContent.put(item.slot.get(0), item);
+                } else {
+                    fillInventory(item);
+                }
+            } else if (item.slot.size() > 1) {
+                for(int i : item.slot) {
+                    menuContent.put(i, item);
+                }
             }
-        } else if (item.slot.size() > 1) {
-            for(int i : item.slot) {
-                menuContent.put(i, item);
-            }
-        }
     }
 
     private void fillInventory(ItemHandler item) {

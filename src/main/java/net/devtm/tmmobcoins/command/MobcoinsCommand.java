@@ -2,13 +2,13 @@ package net.devtm.tmmobcoins.command;
 
 import net.devtm.tmmobcoins.TMMobCoins;
 import net.devtm.tmmobcoins.files.FilesManager;
-import net.devtm.tmmobcoins.util.StorageAccess;
 import net.devtm.tmmobcoins.util.MobCoinsPlayer;
+import net.devtm.tmmobcoins.util.StorageAccess;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.tmmobcoins.lib.base.MessageHandler;
 import net.tmmobcoins.lib.base.VersionCheckers;
 import net.tmmobcoins.lib.menu.Menu;
 import net.tmmobcoins.lib.menu.item.ItemHandler;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -69,9 +69,9 @@ public class MobcoinsCommand extends BukkitCommand {
         if(args.length < 1) {
             if(TMMobCoins.PLUGIN.isEnabledMenu()
                     && (commandSender instanceof Player) && commandSender.hasPermission("tmmobcoins.shop")
-                    && FilesManager.FILES.getConfig().getConfig().getBoolean("shop.settings.default_command")) {
+                    && FilesManager.ACCESS.getConfig().getConfig().getBoolean("shop.settings.default_command")) {
 
-                Configuration config = FilesManager.FILES.getConfig().getConfig();
+                Configuration config = FilesManager.ACCESS.getConfig().getConfig();
                 Menu menu = new Menu((Player) commandSender, MessageHandler.chat(config.getString("shop.menu_title")).placeholderAPI(commandSender).toStringColor(), config.getInt("shop.size"));
                 for (String s1 : config.getConfigurationSection("shop.items").getKeys(false))
                     menu.assignItems(new ItemHandler().setPlayer(((Player) commandSender).getPlayer()).autoGetter(config, "shop.items", s1));
@@ -84,7 +84,16 @@ public class MobcoinsCommand extends BukkitCommand {
             switch (args[0].toLowerCase(Locale.ROOT)) {
                 case "reload":
                     if(!commandSender.hasPermission("tmmobcoins.command.reload")) { commandSender.sendMessage(MessageHandler.message("basic.no_permission").prefix().toStringColor()); return true;}
-                    FilesManager.FILES.reload();
+                    if(args.length > 1) {
+                        TMMobCoins.PLUGIN.getUtils().regenerateItems(FilesManager.ACCESS.getConfig().getConfig(), "normal");
+                        TMMobCoins.PLUGIN.getUtils().regenerateItems(FilesManager.ACCESS.getConfig().getConfig(), "special");
+                        FilesManager.ACCESS.getData().getConfig().set("refresh_data.normal", System.currentTimeMillis()
+                                + (FilesManager.ACCESS.getConfig().getConfig().getInt("shop.settings.rotating_item.settings.normal.refresh_time") * 1000L));
+                        FilesManager.ACCESS.getData().getConfig().set("refresh_data.special", System.currentTimeMillis()
+                                + (FilesManager.ACCESS.getConfig().getConfig().getInt("shop.settings.rotating_item.settings.special.refresh_time") * 1000L));
+                        FilesManager.ACCESS.getData().saveConfig();
+                    }
+                    FilesManager.ACCESS.reload();
                     //TMTokens.PLUGIN.commandsSetup();
                     commandSender.sendMessage(MessageHandler.message("commands.reload.success").prefix().toStringColor());
                     commandSender.sendMessage(MessageHandler.message("commands.reload.commands").prefix().toStringColor());
@@ -159,12 +168,12 @@ public class MobcoinsCommand extends BukkitCommand {
                             try {
                                 double multiplier = Double.parseDouble(args[3]);
                                 MobCoinsPlayer tp = StorageAccess.getAccount(TMMobCoins.PLUGIN.getUtils().getPlayerUUID(args[2]));
-                                commandSender.sendMessage(MessageHandler.message("commands.multiplier.set.player").prefix()
+                                commandSender.sendMessage(MessageHandler.message("commands.multiplier.set.otherplayer").prefix()
                                         .replace("%pl_player%", args[2]).replace("%pl_multiplier%", multiplier + "")
                                         .placeholderAPI(commandSender).toStringColor());
                                 tp.setMultiplier(multiplier); tp.uploadPlayer();
                                 if(!args[2].equalsIgnoreCase(commandSender.getName()) && TMMobCoins.PLUGIN.getUtils().getPlayer(args[2]) instanceof Player)
-                                    Bukkit.getPlayer(args[2]).sendMessage(MessageHandler.message("commands.multiplier.set.otherplayer").prefix()
+                                    Bukkit.getPlayer(args[2]).sendMessage(MessageHandler.message("commands.multiplier.set.player").prefix()
                                             .replace("%pl_player%", args[2]).replace("%pl_multiplier%", multiplier + "")
                                             .placeholderAPI(commandSender).toStringColor());
                             }catch (Exception e) {
@@ -191,8 +200,8 @@ public class MobcoinsCommand extends BukkitCommand {
                             try {
                                 double multiplier = Double.parseDouble(args[2]);
                                 if(multiplier != 0) {
-                                    FilesManager.FILES.getData().getConfig().set("global_multiplier", multiplier);
-                                    FilesManager.FILES.getData().saveConfig();
+                                    FilesManager.ACCESS.getData().getConfig().set("global_multiplier", multiplier);
+                                    FilesManager.ACCESS.getData().saveConfig();
                                     commandSender.sendMessage(MessageHandler.message("commands.multiplier.global.success").prefix()
                                             .replace("%pl_player%", "All Server").replace("%pl_multiplier%", multiplier + "")
                                             .placeholderAPI(commandSender).toStringColor());

@@ -9,7 +9,7 @@ import net.devtm.tmmobcoins.TMMobCoinsPlugin;
 
 @Getter
 public enum FilesManager {
-    FILES;
+    ACCESS;
 
     private dataFile data;
     private localeFile locale;

@@ -1,3 +1,9 @@
+refresh_data:
+  normal: -1
+  special: -1
+  items_in_storage:
+    special: []
+    normal: []
 global_multiplier: 1
 mobcoins:
   uuid: 100

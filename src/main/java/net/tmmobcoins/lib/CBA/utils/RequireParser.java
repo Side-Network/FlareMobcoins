@@ -40,7 +40,7 @@ public class RequireParser {
                     return ClickType.valueOf(arguments[1]).equals(clickType);
                 else return true;
         }
-        Lib.LIB.getPlugin().getLogger().log(Level.WARNING, "We found a problem trying to compile you`re requirement: ");
+        Lib.LIB.getPlugin().getLogger().log(Level.WARNING, "We found a problem trying to compile you`re requirement: " + arguments[0]);
         return false;
     }
 
@@ -54,12 +54,12 @@ public class RequireParser {
                 case "!=":
                     return !Objects.equals(op1, op2);
                 case ">=":
-                    return Integer.parseInt(op1) >= Integer.parseInt(op2);
+                    return Double.parseDouble(op1) >= Double.parseDouble(op2);
                 case "<=":
                     return Integer.parseInt(op1) <= Integer.parseInt(op2);
             }
         } catch (Exception e) {
-            Lib.LIB.getPlugin().getLogger().log(Level.INFO, ColorAPI.process("&7(( &cERROR &7)) &cTMPL Error expression is wrong! Please check the documentations and the online checker: &f" + e.getMessage()));
+            Lib.LIB.getPlugin().getLogger().log(Level.INFO, ColorAPI.process("We found a problem trying to compile you`re expression: "));
         }
         return false;
     }

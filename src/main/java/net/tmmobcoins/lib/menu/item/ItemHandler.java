@@ -29,6 +29,7 @@ public class ItemHandler {
     private Player player;
     public boolean update;
     public int priority = 99;
+    public int amount = 1;
 
     public ItemHandler() {}
 
@@ -51,10 +52,15 @@ public class ItemHandler {
                 this.viewRequirement = null;
 
             if(config.contains(pre + "." + itemName + ".priority"))
-                this.priority = config.getInt(pre + "." + itemName + ".priority")
-                        ;
+                this.priority = config.getInt(pre + "." + itemName + ".priority");
+
+            if(config.contains(pre + "." + itemName + ".amount"))
+                this.amount = config.getInt(pre + "." + itemName + ".amount");
+
             if(config.contains(pre + "." + itemName + ".slots")) {
                 setSlots(config.getIntegerList(pre + "." + itemName + ".slots"));
+            } else if(config.contains(pre + "." + itemName + ".slot")) {
+                setSlots(config.getInt(pre + "." + itemName + ".slot"));
             } else if(config.contains(pre + "." + itemName + ".slot")) {
                 setSlots(config.getInt(pre + "." + itemName + ".slot"));
             }
@@ -132,6 +138,7 @@ public class ItemHandler {
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(MessageHandler.chat(displayName).placeholderAPI(player).toStringColor());
         meta.setLore(l);
+        item.setAmount(amount);
         item.setItemMeta(meta);
         Objects.requireNonNull(item.getItemMeta()).setCustomModelData(customData);
         if(!view) {

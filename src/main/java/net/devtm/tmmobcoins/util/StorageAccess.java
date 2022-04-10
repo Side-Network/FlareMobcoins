@@ -14,12 +14,12 @@ public class StorageAccess {
 
     @Nullable
     public static MobCoinsPlayer getAccount(UUID uuid) {
-        switch (Objects.requireNonNull(FilesManager.FILES.getConfig().getConfig().getString("storage_type.type")).toLowerCase(Locale.ROOT)) {
+        switch (Objects.requireNonNull(FilesManager.ACCESS.getConfig().getConfig().getString("storage_type.type")).toLowerCase(Locale.ROOT)) {
             case "file":
                 if (!hasAccount(uuid))
                     createAccount(uuid);
-                return new MobCoinsPlayer(uuid, FilesManager.FILES.getData().getConfig().getDouble("account." + uuid + ".mobcoins"),
-                        FilesManager.FILES.getData().getConfig().getDouble("account." + uuid + ".multiplier"));
+                return new MobCoinsPlayer(uuid, FilesManager.ACCESS.getData().getConfig().getDouble("account." + uuid + ".mobcoins"),
+                        FilesManager.ACCESS.getData().getConfig().getDouble("account." + uuid + ".multiplier"));
             case "database":
                 if (!hasAccount(uuid))
                     createAccount(uuid);
@@ -33,9 +33,9 @@ public class StorageAccess {
     }
 
     public static boolean hasAccount(UUID uuid) {
-        switch (Objects.requireNonNull(FilesManager.FILES.getConfig().getConfig().getString("storage_type.type")).toLowerCase(Locale.ROOT)) {
+        switch (Objects.requireNonNull(FilesManager.ACCESS.getConfig().getConfig().getString("storage_type.type")).toLowerCase(Locale.ROOT)) {
             case "file":
-                return FilesManager.FILES.getData().getConfig().contains("account." + uuid);
+                return FilesManager.ACCESS.getData().getConfig().contains("account." + uuid);
             case "database":
                 return Lib.LIB.getMySQL().sqlIO.exists("uuid", uuid.toString(), TMMobCoins.PLUGIN.getUtils().table);
             case "sqlite":
@@ -46,12 +46,12 @@ public class StorageAccess {
     }
 
     public static void createAccount(UUID uuid) {
-        switch (Objects.requireNonNull(FilesManager.FILES.getConfig().getConfig().getString("storage_type.type")).toLowerCase(Locale.ROOT)) {
+        switch (Objects.requireNonNull(FilesManager.ACCESS.getConfig().getConfig().getString("storage_type.type")).toLowerCase(Locale.ROOT)) {
             case "file":
                 if (!hasAccount(uuid)) {
-                    FilesManager.FILES.getData().getConfig().set("account." + uuid + ".mobcoins", TMMobCoins.PLUGIN.getUtils().firstJoinGiveMobcoins);
-                    FilesManager.FILES.getData().getConfig().set("account." + uuid + ".multiplier", 1);
-                    FilesManager.FILES.getData().saveConfig();
+                    FilesManager.ACCESS.getData().getConfig().set("account." + uuid + ".mobcoins", TMMobCoins.PLUGIN.getUtils().firstJoinGiveMobcoins);
+                    FilesManager.ACCESS.getData().getConfig().set("account." + uuid + ".multiplier", 1);
+                    FilesManager.ACCESS.getData().saveConfig();
                 }
                 break;
             case "database":
@@ -68,13 +68,13 @@ public class StorageAccess {
     }
 
     public static void insertAccount(MobCoinsPlayer tp) {
-        switch (Objects.requireNonNull(FilesManager.FILES.getConfig().getConfig().getString("storage_type.type")).toLowerCase(Locale.ROOT)) {
+        switch (Objects.requireNonNull(FilesManager.ACCESS.getConfig().getConfig().getString("storage_type.type")).toLowerCase(Locale.ROOT)) {
             case "file":
                 if (hasAccount(tp.getUUID()))
                     createAccount(tp.getUUID());
-                FilesManager.FILES.getData().getConfig().set("account." + tp.getUUID() + ".mobcoins", tp.getMobcoins());
-                FilesManager.FILES.getData().getConfig().set("account." + tp.getUUID() + ".multiplier", tp.getMultiplier());
-                FilesManager.FILES.getData().saveConfig();
+                FilesManager.ACCESS.getData().getConfig().set("account." + tp.getUUID() + ".mobcoins", tp.getMobcoins());
+                FilesManager.ACCESS.getData().getConfig().set("account." + tp.getUUID() + ".multiplier", tp.getMultiplier());
+                FilesManager.ACCESS.getData().saveConfig();
                 break;
             case "database":
                 if (hasAccount(tp.getUUID()))

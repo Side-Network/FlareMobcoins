@@ -6,10 +6,10 @@ entity:
 #  ZOMBIE:
 #    drop_value: random_decimal(1;10)
 #    drop_action:
-#      - "[MOBCOINS] give;%pl_mobcoins%"
-#      - "[TITLE] You got;%pl_range%"
+#      - "[CONSOLE] mobcoins give %pl_player% %pl_mobcoins%"
+#      - "[TITLE] &a&l+%pl_mobcoins%;You just got %pl_mobcoins% mobcoins"
 #  SKELETON:
 #    drop_value: random_number(1;10)
 #    drop_action:
-#      - "[MOBCOINS] give;%pl_range%"
-#      - "[TITLE] You got;%pl_range%"
+#      - "[CONSOLE] mobcoins give %pl_player% %pl_mobcoins%"
+#      - "[TITLE] &a&l+%pl_mobcoins%;You just got %pl_mobcoins% mobcoins"

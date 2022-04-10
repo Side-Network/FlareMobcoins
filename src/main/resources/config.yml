@@ -1,5 +1,7 @@
 allow_bstats: true
 
+select_locale: en
+
 main_command_aliases:
   - "tmmobcoins"
   - "mc"
@@ -22,18 +24,25 @@ storage_type:
 first_join_give_mobcoins: 0
 
 shop:
+  # Read more here: https://mobcoins.devtm.net/basic-setup/making-the-shop
   # Every change in the setting will require a restart or reload (Plugman should work fine)
   settings:
     # This could use the mobcoins base command (ex: /mobcoins) to open the shop
     default_command: false
     open_command: "mobcoinshop"
+    shop_type: normal
   enabled: false
   menu_title: 'SHOP'
   size: 45
   items:
     glass11:
       material: BLACK_STAINED_GLASS_PANE
-      data: 0
       update: false
       display_name: '&7Expample'
       slot: 0
+      click_commands:
+        - "if"
+        - " [REQUIRE(expression;%pl_mobcoins%;>=;100)]"
+        - "do"
+        - " [CONSOLE] say hello"
+        - "end"

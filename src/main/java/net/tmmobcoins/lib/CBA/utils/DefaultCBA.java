@@ -44,6 +44,20 @@ public class DefaultCBA implements CBAMethods {
                 for (Player pl : Bukkit.getOnlinePlayers())
                     pl.sendMessage(MessageHandler.chat(actionContent).placeholderAPI(player).addColors().toString());
                 break;
+            case "exit":
+                if(Lib.LIB.getGui() != null) {
+                    if(Lib.LIB.getGui().menuHolder.containsKey(player.getUniqueId())) {
+                        Lib.LIB.getGui().menuHolder.get(player.getUniqueId()).deleteInventory();
+                    }
+                }
+                break;
+            case "refresh":
+                if(Lib.LIB.getGui() != null) {
+                    if(Lib.LIB.getGui().menuHolder.containsKey(player.getUniqueId())) {
+                        Lib.LIB.getGui().menuHolder.get(player.getUniqueId()).updateInventory();
+                    }
+                }
+                break;
             case "title":
                 /* Titles: [TITLE] title;subtitle;in;stay;out */
                 /* Titles: [TITLE] title;subtitle */
@@ -90,7 +104,7 @@ public class DefaultCBA implements CBAMethods {
                 firework.detonate();
                 break;
             default:
-                Lib.LIB.getPlugin().getLogger().log(Level.INFO, ColorAPI.process("&7(( &cERROR &7)) &cTMPL Error on a command because ACTION type not exists on command! Command: &f"));
+                Lib.LIB.getPlugin().getLogger().log(Level.SEVERE, ColorAPI.process("&cTMPL Error on a command because ACTION type not exists on command! Command: &f"));
                 break;
         }
     }
