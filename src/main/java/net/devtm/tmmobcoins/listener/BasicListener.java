@@ -1,6 +1,7 @@
 package net.devtm.tmmobcoins.listener;
 
 import net.devtm.tmmobcoins.API.MobCoinReceiveEvent;
+import net.devtm.tmmobcoins.TMMobCoins;
 import net.devtm.tmmobcoins.files.FilesManager;
 import net.devtm.tmmobcoins.util.MobCoinsPlayer;
 import net.devtm.tmmobcoins.util.StorageAccess;
@@ -8,6 +9,7 @@ import net.tmmobcoins.lib.CBA.TMPL;
 import net.tmmobcoins.lib.CBA.utils.CodeArray;
 import net.tmmobcoins.lib.base.VersionCheckers;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
@@ -18,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +63,7 @@ public class BasicListener implements Listener {
         double mobcoins;
 
         if(drops.contains("entity." + entity.getName().toUpperCase(Locale.ROOT) + ".drop_value"))
-            mobcoins = Double.parseDouble(String.format("%.2f", generateNumber(drops, event) * tp.getMultiplier() * FilesManager.ACCESS.getData().getConfig().getDouble("global_multiplier")));
+            mobcoins = Double.parseDouble(String.format("%.2f", generateNumber(drops, entity.getName()) * tp.getMultiplier() * FilesManager.ACCESS.getData().getConfig().getDouble("global_multiplier")));
         else
             mobcoins = 0;
 
@@ -84,18 +87,63 @@ public class BasicListener implements Listener {
         }
     }
 
-    private double generateNumber(Configuration config, EntityDeathEvent event) {
-        if(!config.contains("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT) + ".drop_value")) return 0;
-        String str = config.getString("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT) + ".drop_value");
-        String[] definition = str.substring(0, str.length() - 1).split("\\(");
+    private double generateNumber(@NotNull Configuration config, @NotNull String entityName) {
+        final double defaultNumber = 0;
+        final String entityConfigPath = String.format(
+                "entity.%s.drop_value",
+                entityName.toUpperCase(Locale.ROOT)
+        );
+
+        if (!config.contains(entityConfigPath)) {
+            return defaultNumber;
+        }
+
+        String dropValue = config.getString(entityConfigPath);
+        if (dropValue == null) {
+            return defaultNumber;
+        }
+
+        String[] definition = dropValue.substring(0, dropValue.length() - 1).split("\\(");
         String[] interval = definition[1].split(";");
         Random rand = new Random();
+
+        // When an end-user fills in a decimal number for random_number or random_decimal throw error in console that
+        // a decimal number is not supported
+        Integer parsedIntervalToIntegerOne = null;
+        Integer parsedIntervalToIntegerTwo = null;
+        try {
+            parsedIntervalToIntegerOne = Integer.parseInt(interval[0]);
+            parsedIntervalToIntegerTwo = Integer.parseInt(interval[1]);
+        } catch (NumberFormatException e) {
+            sendConsoleError(entityConfigPath);
+            //e.printStackTrace();
+        }
+
+        if (parsedIntervalToIntegerOne == null || parsedIntervalToIntegerTwo == null) {
+            return defaultNumber;
+        }
+
+        int randomNextInt = rand.nextInt(
+                (parsedIntervalToIntegerTwo - parsedIntervalToIntegerOne) + 1
+        ) + parsedIntervalToIntegerOne;
+
         switch (definition[0].toLowerCase(Locale.ROOT)) {
             case "random_number":
-                return rand.nextInt((Integer.parseInt(interval[1]) - Integer.parseInt(interval[0])) + 1) + Integer.parseInt(interval[0]);
+                return randomNextInt;
             case "random_decimal":
-                return rand.nextDouble() * (rand.nextInt((Integer.parseInt(interval[1]) - Integer.parseInt(interval[0])) + 1) + Integer.parseInt(interval[0]));
+                return rand.nextDouble() * randomNextInt;
         }
-        return 0;
+        return defaultNumber;
+    }
+
+    private void sendConsoleError(String entityConfigPath) {
+        TMMobCoins.PLUGIN.getPlugin().getServer().getConsoleSender().sendMessage(String.format(
+                "[TMMobCoins] %sERROR: There is a not supported number used in your drops.yml config at %s%s%s. "
+                        + "Only rounded numbers are supported for this option",
+                ChatColor.RED,
+                ChatColor.GOLD,
+                entityConfigPath,
+                ChatColor.RED
+        ));
     }
 }
