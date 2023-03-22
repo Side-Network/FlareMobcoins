@@ -1,0 +1,306 @@
+menu_title: "Rotating shop exmaple"
+size: 54
+rotating_shop:
+  # here you will add the time refresh for the normal and premium categories (in seconds)
+  normal_refresh: 120
+  premium_refresh: 240
+  normal_slots:
+    - 19
+    - 20
+    - 21
+    - 28
+    - 29
+    - 30
+  premium_slots:
+    - 23
+    - 24
+    - 25
+    - 32
+    - 33
+    - 34
+  normal_items:
+    gold_block: "stock(server,50)"
+    emerald_block: "stock(server,50)"
+    diamond_block: "stock(server,50)"
+    dirt: "stock(server,50)"
+    stone: "stock(server,50)"
+    oak_log: "stock(server,50)"
+  premium_items:
+    iron_block: "stock(player,100)"
+    mvprank: "stock(server,1)"
+    zombie_spawner: "stock(server,2)"
+    skeleton_spawner: "stock(server,2)"
+    pig_spawner: "stock(server,2)"
+    viprank: "stock(server,1)"
+    netherite_block: "stock(server,4)"
+items:
+  clock_normal:
+    material: "[HEAD] eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTQyYzg2ODczYTE1NWI4MmU2NmU4MjdmOWFjYmFmOWM2MDBiYjAxZmVmNzBkODc1ZDNmOWI0OWQwMjc5Y2I0NyJ9fX0="
+    update: true
+    display_name: '&a&lNORMAL SHOP'
+    lore:
+    - ""
+    - " &fNormal shop will reset in:"
+    - " &f - &7&o%pl_rotating_shop_main_normal%"
+    - ""
+    slot: 11
+  clock_premium:
+    material: "[HEAD] eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGM3Y2U2ZjdhNzk3YTcxYTkxMWRiYzhlNjI2NzAyYjk3MzViN2QzYzJlOWZjYjI2YjgyY2FjZmM2Y2UwMWYxYSJ9fX0="
+    update: true
+    display_name: '&a&lPREMIUM SHOP'
+    lore:
+    - ""
+    - " &fPremium shop will reset in:"
+    - " &f - &7&o%pl_rotating_shop_main_premium%"
+    - ""
+    slot: 15
+  glass:
+    material: "GRAY_STAINED_GLASS_PANE"
+    update: true
+    display_name: '&7'
+    slots:
+      - 43
+      - 42
+      - 41
+      - 39
+      - 38
+      - 37
+  diamond_block:
+    material: DIAMOND_BLOCK
+    amount: 16
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&lDIAMOND BLOCK</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a simple block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(100 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 100"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&l16 IRON BLOCKS</GRADIENT>!"
+      - "[CONSOLE] give %pl_player% iron_block 16"
+      - "[EXIT]"
+  gold_block:
+    material: GOLD_BLOCK
+    amount: 8
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&lGOLD BLOCK</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a simple block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(100 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 100"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&l8 GOLD BLOCKS</GRADIENT>!"
+      - "[CONSOLE] give %pl_player% glod_block 8"
+      - "[EXIT]"
+  emerald_block:
+    material: EMERALD_BLOCK
+    amount: 16
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&lEMERALD BLOCK</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a simple block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(100 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 100"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&l16 EMERALD BLOCKS</GRADIENT>!"
+      - "[CONSOLE] give %pl_player% emerald_block 16"
+      - "[EXIT]"
+  dirt:
+    material: DIRT
+    amount: 64
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&lDIRT BLOCK</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a simple block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(10 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 10"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&l64 DIRT BLOCKS</GRADIENT>!"
+      - "[CONSOLE] give %pl_player% dirt 64"
+      - "[EXIT]"
+  stone:
+    material: STONE
+    amount: 64
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&lSTONE</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a simple block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(20 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 20"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&l64 STONE BLOCKS</GRADIENT>!"
+      - "[CONSOLE] give %pl_player% stone 64"
+      - "[EXIT]"
+  oak_log:
+    material: OAK_LOG
+    amount: 64
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&lOAK LOG</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a simple block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(40 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 40"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&l64 OAK BLOCKS</GRADIENT>!"
+      - "[CONSOLE] give %pl_player% oak 64"
+      - "[EXIT]"
+  pig_spawner:
+    material: SPAWNER
+    amount: 1
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&lPIG SPAWNER</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a simple block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(4000 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 4000"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&la pig SPAWNER</GRADIENT>!"
+      - "[CONSOLE] ss add %pl_player% pig 1"
+      - "[EXIT]"
+  zombie_spawner:
+    material: SPAWNER
+    amount: 1
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&lzomblie SPAWNER</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a simple block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(900 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 900"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&la zombie SPAWNER</GRADIENT>!"
+      - "[CONSOLE] ss add %pl_player% zombie 1"
+      - "[EXIT]" 
+  skeleton_spawner:
+    material: SPAWNER
+    amount: 1
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&lSkeleton SPAWNER</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a simple block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(5000 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 5000"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&la skeleton SPAWNER</GRADIENT>!"
+      - "[CONSOLE] ss add %pl_player% skeleton 1"
+      - "[EXIT]"
+  mvprank:
+    material: NAME_TAG
+    amount: 1
+    update: true
+    display_name: '<GRADIENT:#a3f37d-#79fd4a>&lMVP RANK</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy this rank using tokens'
+      - ' &fto get new permissions.'
+      - ''
+      - '<GRADIENT:#a3f37d-#79fd4a>&lDETAILS:</GRADIENT>'
+      - ' &#9cf575› &fHigh Queue'
+      - ' &#9cf575› &fExclusive Cosmetics'
+      - ' &#9cf575› &fOpen Multiple Mystery Boxes '
+      - ' &#9cf575› &fExclusive Gadgets'
+      - ' &#9cf575› &fAuto Tip'
+      - ' &#9cf575› &fAchievements Tracking'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this rank (15000 mobcoins).'  
+    click_commands:
+      - "[buy(mobcoins)] 15000"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&lMVP RANK</GRADIENT>!"
+      - "[CONSOLE] lp user %pl_player% parent add mvp"
+      - "[EXIT]"    
+  viprank:
+    material: MAGMA_CREAM
+    amount: 1
+    update: true
+    display_name: '<GRADIENT:#a3f37d-#79fd4a>&lVIP RANK</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy this rank using tokens'
+      - ' &fto get new permissions.'
+      - ''
+      - '<GRADIENT:#a3f37d-#79fd4a>&lDETAILS:</GRADIENT>'
+      - ' &#9cf575› &fHigh Queue'
+      - ' &#9cf575› &fExclusive Cosmetics'
+      - ' &#9cf575› &fOpen Multiple Mystery Boxes '
+      - ' &#9cf575› &fExclusive Gadgets'
+      - ' &#9cf575› &fAuto Tip'
+      - ' &#9cf575› &fAchievements Tracking'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this rank (10000 mobcoins).'
+    click_commands:
+      - "[buy(mobcoins)] 10000"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&lVIP RANK</GRADIENT>!"
+      - "[CONSOLE] lp user %pl_player% parent add vip"
+      - "[EXIT]"      
+  netherite_block:
+    material: NETHERITE_BLOCK
+    amount: 4
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&lNETHERITE LOG</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a special block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(500 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 500"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&l4 Netherite blocks</GRADIENT>!"
+      - "[CONSOLE] give %pl_player% netherite_block 4"
+      - "[EXIT]"
+  fly:
+    material: "[head] eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjg1MTlkNDUwNWY0Y2VlNGMwOWI2OGRiMzUwYmIxMTNlNzUzZDdhMGVmNjFkN2U0YzQwNDhiZWU4NGExNTdhNSJ9fX0="
+    amount: 1
+    update: true
+    display_name: '<GRADIENT:#F2F2F2-#EAEAEA>&l1H Fly</GRADIENT>'
+    lore:
+      - ''
+      - ' &fBuy a special block'
+      - ''
+      - ' &a&lStock: &7%pl_stock%/%pl_max_stock%'
+      - ''
+      - '&7Click to buy this block. &o(500 mobcoins)'
+    click_commands:
+      - "[buy(mobcoins)] 500"
+      - "[MESSAGE] &#7F00FF&lPURCHASED! &fYou now have <GRADIENT:#6ee3f3-#8cc0fd>&l+1H of fly</GRADIENT>!"
+      - "[CONSOLE] tfly give %pl_player% 1h"
+      - "[EXIT]"
