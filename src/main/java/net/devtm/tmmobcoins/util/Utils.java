@@ -1,18 +1,16 @@
 package net.devtm.tmmobcoins.util;
 
+import net.devtm.tmmobcoins.TMMobCoins;
+import net.devtm.tmmobcoins.files.FilesManager;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.UUID;
-import net.devtm.tmmobcoins.API.MobcoinsPlayer;
-import net.devtm.tmmobcoins.TMMobCoins;
-import net.devtm.tmmobcoins.files.FilesManager;
-import net.devtm.tmmobcoins.service.ServiceHandler;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 public enum Utils {
     UTILS;
@@ -52,7 +50,9 @@ public enum Utils {
         long difference_In_Hours = difference_In_Time / 3600000L % 24L;
         long difference_In_Years = difference_In_Time / 31536000000L;
         long difference_In_Days = difference_In_Time / 86400000L % 365L;
-        return FilesManager.ACCESS.getConfig().getConfig().getString("rotating_shop_time_format").replace("%years%", difference_In_Years + "")
+        //noinspection ConstantConditions
+        return FilesManager.ACCESS.getConfig().getConfig().getString("rotating_shop_time_format")
+                .replace("%years%", difference_In_Years + "")
                 .replace("%days%", difference_In_Days + "")
                 .replace("%hours%", difference_In_Hours + "")
                 .replace("%min%", difference_In_Minutes + "")
@@ -60,10 +60,10 @@ public enum Utils {
     }
 
     public static FileConfiguration readConfig(String file) {
-        return (FileConfiguration)YamlConfiguration.loadConfiguration(new File(TMMobCoins.PLUGIN.getPlugin().getDataFolder(), file));
+        return YamlConfiguration.loadConfiguration(new File(TMMobCoins.PLUGIN.getPlugin().getDataFolder(), file));
     }
 
     public static FileConfiguration readConfig(Path file) {
-        return (FileConfiguration)YamlConfiguration.loadConfiguration(new File(file.toString()));
+        return YamlConfiguration.loadConfiguration(new File(file.toString()));
     }
 }

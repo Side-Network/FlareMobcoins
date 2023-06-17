@@ -1,24 +1,49 @@
 package net.devtm.tmmobcoins.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import net.devtm.tmmobcoins.TMMobCoins;
 import net.devtm.tmmobcoins.files.FilesManager;
 import net.devtm.tmmobcoins.util.ShopStock;
 import net.devtm.tmmobcoins.util.StockProfile;
 import net.devtm.tmmobcoins.util.Utils;
 import net.tmmobcoins.lib.CBA.TMPL;
+import net.tmmobcoins.lib.menu_modified.GUI;
 import net.tmmobcoins.lib.menu_modified.Menu;
 import net.tmmobcoins.lib.menu_modified.item.ItemHandler;
-import org.bukkit.configuration.Configuration;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MenuService {
+
+    public MenuService() {
+        String shopName = FilesManager.ACCESS.getConfig().getConfig().getString("shop.main_shop");
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                FileConfiguration data = FilesManager.ACCESS.getData().getConfig();
+                FileConfiguration shop = Utils.readConfig("shop/" + shopName + ".yml");
+
+                if (data.getLong("rotating_shop." + shopName + ".normal_last_time") <= System.currentTimeMillis()) {
+                    FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + shopName + ".normal_last_time", System.currentTimeMillis() + shop.getInt("rotating_shop.normal_refresh") * 1000L);
+                    FilesManager.ACCESS.getData().saveConfig();
+                    generateItems(shopName, 1);
+                }
+                if (data.getLong("rotating_shop." + shopName + ".premium_last_time") <= System.currentTimeMillis()) {
+                    FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + shopName + ".premium_last_time", System.currentTimeMillis() + shop.getInt("rotating_shop.premium_refresh") * 1000L);
+                    FilesManager.ACCESS.getData().saveConfig();
+                    generateItems(shopName, 2);
+                }
+            }
+        }.runTaskTimer(TMMobCoins.PLUGIN.getPlugin(), 0L, 20L);
+    }
+
     public void openMenu(Player player, String s) {
         FileConfiguration config = Utils.readConfig("shop/" + s + ".yml");
         if (config.contains("menu_permission") &&
@@ -32,7 +57,7 @@ public class MenuService {
         }
         Menu menu = config.contains("menu_type") ? new Menu(player, config.getString("menu_title"), InventoryType.valueOf(config.getString("menu_type")), s) : new Menu(player, config.getString("menu_title"), config.getInt("size"), s);
         for (String s1 : config.getConfigurationSection("items").getKeys(false))
-            menu.assignItems((new ItemHandler()).setPlayer(player).setShopName(s).autoGetter((Configuration)config, "items", s1));
+            menu.assignItems((new ItemHandler()).setPlayer(player).setShopName(s).autoGetter(config, "items", s1));
         if (config.contains("rotating_shop"))
             menu = createRotatingMenu(player, s, menu);
         menu.updateContent();
@@ -41,28 +66,17 @@ public class MenuService {
 
     public void updateRotatingShop(String shopName) {
         FileConfiguration data = FilesManager.ACCESS.getData().getConfig();
-        FileConfiguration shop = Utils.readConfig("shop/" + shopName + ".yml");
         if (!data.contains("rotating_shop." + shopName))
             initData(shopName);
-        if (data.getLong("rotating_shop." + shopName + ".normal_last_time") <= System.currentTimeMillis()) {
-            generateItems(shopName, 1);
-            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + shopName + ".normal_last_time", System.currentTimeMillis() + shop.getInt("rotating_shop.normal_refresh") * 1000L);
-            FilesManager.ACCESS.getData().saveConfig();
-        }
-        if (data.getLong("rotating_shop." + shopName + ".premium_last_time") <= System.currentTimeMillis()) {
-            generateItems(shopName, 2);
-            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + shopName + ".premium_last_time", System.currentTimeMillis() + shop.getInt("rotating_shop.premium_refresh") * 1000L);
-            FilesManager.ACCESS.getData().saveConfig();
-        }
     }
 
     private Menu createRotatingMenu(Player player, String shopName, Menu menu) {
         updateRotatingShop(shopName);
         FileConfiguration shop = Utils.readConfig("shop/" + shopName + ".yml");
         for (String key : FilesManager.ACCESS.getData().getConfig().getConfigurationSection("rotating_shop." + shopName + ".items_normal").getKeys(false))
-            menu.assignItems((new ItemHandler()).setPlayer(player).setShopName(shopName).autoGetter((Configuration)shop, "items", key).setSlots(FilesManager.ACCESS.getData().getConfig().getInt("rotating_shop." + shopName + ".items_normal." + key + ".slot")));
+            menu.assignItems((new ItemHandler()).setPlayer(player).setShopName(shopName).autoGetter(shop, "items", key).setSlots(FilesManager.ACCESS.getData().getConfig().getInt("rotating_shop." + shopName + ".items_normal." + key + ".slot")));
         for (String key : FilesManager.ACCESS.getData().getConfig().getConfigurationSection("rotating_shop." + shopName + ".items_premium").getKeys(false))
-            menu.assignItems((new ItemHandler()).setPlayer(player).setShopName(shopName).autoGetter((Configuration)shop, "items", key).setSlots(FilesManager.ACCESS.getData().getConfig().getInt("rotating_shop." + shopName + ".items_premium." + key + ".slot")));
+            menu.assignItems((new ItemHandler()).setPlayer(player).setShopName(shopName).autoGetter(shop, "items", key).setSlots(FilesManager.ACCESS.getData().getConfig().getInt("rotating_shop." + shopName + ".items_premium." + key + ".slot")));
         return menu;
     }
 
@@ -114,6 +128,10 @@ public class MenuService {
     }
 
     private void generateItems(String s, int which) {
+        List<UUID> toDelete = new ArrayList<>(GUI.menuHolder.keySet());
+        for (UUID uuid : toDelete)
+            GUI.menuHolder.get(uuid).deleteInventory();
+
         FileConfiguration shop = Utils.readConfig("shop/" + s + ".yml");
         if (which == 1 || which == 3)
             FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_normal", null);
@@ -127,13 +145,13 @@ public class MenuService {
             int itemId = (new Random()).nextInt(normalItems.size());
             int slotId = (new Random()).nextInt(normalSlots.size());
             ShopStock stock = new ShopStock();
-            Matcher matcher = Pattern.compile("stock\\((server|player)\\,(\\d+)\\)").matcher(shop.getString("rotating_shop.normal_items." + (String)normalItems.get(itemId)));
+            Matcher matcher = Pattern.compile("stock\\((server|player)\\,(\\d+)\\)").matcher(shop.getString("rotating_shop.normal_items." + normalItems.get(itemId)));
             matcher.find();
             stock.setType(ShopStock.StockType.valueOf(matcher.group(1).toUpperCase(Locale.ROOT)));
             stock.setStock(Integer.parseInt(matcher.group(2)));
-            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_normal." + (String)normalItems.get(itemId) + ".slot", normalSlots.get(slotId));
-            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_normal." + (String)normalItems.get(itemId) + ".stock", Integer.valueOf(stock.getStock()));
-            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_normal." + (String)normalItems.get(itemId) + ".stock_type", stock.getType().toString());
+            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_normal." + normalItems.get(itemId) + ".slot", normalSlots.get(slotId));
+            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_normal." + normalItems.get(itemId) + ".stock", stock.getStock());
+            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_normal." + normalItems.get(itemId) + ".stock_type", stock.getType().toString());
             normalItems.remove(itemId);
             normalSlots.remove(slotId);
         }
@@ -141,13 +159,13 @@ public class MenuService {
             int itemId = (new Random()).nextInt(premiumItems.size());
             int slotId = (new Random()).nextInt(premiumSlots.size());
             ShopStock stock = new ShopStock();
-            Matcher matcher = Pattern.compile("stock\\((server|player)\\,(\\d+)\\)").matcher(shop.getString("rotating_shop.premium_items." + (String)premiumItems.get(itemId)));
+            Matcher matcher = Pattern.compile("stock\\((server|player)\\,(\\d+)\\)").matcher(shop.getString("rotating_shop.premium_items." + premiumItems.get(itemId)));
             matcher.find();
             stock.setType(ShopStock.StockType.valueOf(matcher.group(1).toUpperCase(Locale.ROOT)));
             stock.setStock(Integer.parseInt(matcher.group(2)));
-            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_premium." + (String)premiumItems.get(itemId) + ".slot", premiumSlots.get(slotId));
-            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_premium." + (String)premiumItems.get(itemId) + ".stock", Integer.valueOf(stock.getStock()));
-            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_premium." + (String)premiumItems.get(itemId) + ".stock_type", stock.getType().toString());
+            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_premium." + premiumItems.get(itemId) + ".slot", premiumSlots.get(slotId));
+            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_premium." + premiumItems.get(itemId) + ".stock", stock.getStock());
+            FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".items_premium." + premiumItems.get(itemId) + ".stock_type", stock.getType().toString());
             premiumItems.remove(itemId);
             premiumSlots.remove(slotId);
         }
@@ -156,8 +174,8 @@ public class MenuService {
 
     private void initData(String s) {
         FileConfiguration shop = Utils.readConfig("shop/" + s + ".yml");
-        FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".normal_last_time", Long.valueOf(System.currentTimeMillis() + shop.getInt("rotating_shop.normal_refresh") * 1000L));
-        FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".premium_last_time", Long.valueOf(System.currentTimeMillis() + shop.getInt("rotating_shop.premium_refresh") * 1000L));
+        FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".normal_last_time", System.currentTimeMillis() + shop.getInt("rotating_shop.normal_refresh") * 1000L);
+        FilesManager.ACCESS.getData().getConfig().set("rotating_shop." + s + ".premium_last_time", System.currentTimeMillis() + shop.getInt("rotating_shop.premium_refresh") * 1000L);
         FilesManager.ACCESS.getData().saveConfig();
         generateItems(s, 3);
     }
