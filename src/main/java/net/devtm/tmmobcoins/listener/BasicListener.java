@@ -28,13 +28,18 @@ import java.util.Locale;
 import java.util.Random;
 
 public class BasicListener implements Listener {
+
     @EventHandler
-    private void onJoin(PlayerJoinEvent e) { StorageAccess.createAccount(e.getPlayer().getUniqueId()); }
+    private void onJoin(PlayerJoinEvent e) {
+        StorageAccess.createAccount(e.getPlayer().getUniqueId());
+    }
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void mobcoinsReceiveEvent(MobCoinReceiveEvent event) {
-        if (event.isCancelled()) return;
-        if (event.getEntity() == null) return;
+        if (event.isCancelled())
+            return;
+        if (event.getEntity() == null)
+            return;
         Configuration drops = FilesManager.ACCESS.getDrops().getConfig();
 
         if (!FilesManager.ACCESS.getDrops().getConfig().contains("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT)))
@@ -55,7 +60,8 @@ public class BasicListener implements Listener {
 
     @EventHandler
     private void onPlayerKillEntity(EntityDeathEvent event) {
-        if (event.getEntity().getKiller() == null) return;
+        if (event.getEntity().getKiller() == null)
+            return;
         MobCoinsPlayer tp = StorageAccess.getAccount(event.getEntity().getKiller().getUniqueId());
         Configuration drops = FilesManager.ACCESS.getDrops().getConfig();
         Entity entity = event.getEntity();
@@ -69,16 +75,18 @@ public class BasicListener implements Listener {
 
         MobCoinReceiveEvent eventMobcoins = new MobCoinReceiveEvent(player, tp, entity, mobcoins);
 
-        if(drops.contains("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT) + ".requirement"))
-            if(!new CodeArray().addConditions(drops.getString("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT) + ".requirement")).checkRequierment(event.getEntity().getKiller()))
+        if(drops.contains("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT) + ".requirement")) {
+            if (!new CodeArray().addConditions(drops.getString("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT) + ".requirement")).checkRequierment(event.getEntity().getKiller()))
                 eventMobcoins.setCancelled(true);
+        }
 
         Bukkit.getPluginManager().callEvent(eventMobcoins);
     }
 
     @EventHandler
     private void playerFireworkDamage(EntityDamageByEntityEvent event) {
-        if(VersionCheckers.getVersion() <= 9) return;
+        if (VersionCheckers.getVersion() <= 9)
+            return;
         if (event.getDamager() instanceof Firework) {
             Firework fw = (Firework) event.getDamager();
             if (fw.hasMetadata("nodamage")) {

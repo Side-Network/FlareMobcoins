@@ -5,3 +5,7 @@ author: TMDevelopment
 description: Best Mob coins plugin plugin
 website: devtm.net
 api-version: 1.13
+
+commands:
+  tmobcoins:
+    description: Main command

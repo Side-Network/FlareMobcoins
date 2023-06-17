@@ -11,14 +11,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 
-public class DropsFile {
+public class DataFile {
 
     private final TMMobCoinsPlugin plugin;
-    private final String file = "drops.yml";
+    private final String file = "data/data.yml";
     private FileConfiguration dataConfig = null;
     private File configFile = null;
 
-    public DropsFile(TMMobCoinsPlugin plugin) {
+    public DataFile(TMMobCoinsPlugin plugin) {
         this.plugin = plugin;
         saveDefaultConfig();
     }

@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 
 public class MySQL {
+
     private Connection connection;
     public SQL sqlIO = new SQL(this);
     String host;

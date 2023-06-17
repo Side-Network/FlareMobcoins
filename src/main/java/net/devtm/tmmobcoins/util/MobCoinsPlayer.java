@@ -5,8 +5,8 @@ import java.util.UUID;
 public class MobCoinsPlayer {
 
     private double mobcoins;
-    private double multiplier = 1;
-    private UUID uuid = null;
+    private double multiplier;
+    private UUID uuid;
 
     public MobCoinsPlayer(UUID uuid, double mobcoins, double multiplier) {
         this.uuid = uuid;

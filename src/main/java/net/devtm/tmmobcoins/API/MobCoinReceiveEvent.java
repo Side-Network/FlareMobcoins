@@ -11,10 +11,10 @@ import org.jetbrains.annotations.NotNull;
 public class MobCoinReceiveEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS_LIST = new HandlerList();
-    private Player player;
-    private MobCoinsPlayer mobCoinsPlayer;
-    private Entity entity;
-    private boolean isCancelled;
+    private final Player player;
+    private final MobCoinsPlayer mobCoinsPlayer;
+    private final Entity entity;
+    private boolean isCancelled = false;
     private double obtainedAmount;
 
     public MobCoinReceiveEvent(Player player, MobCoinsPlayer mobCoinsPlayer, Entity entity, double obtainedAmount) {
@@ -22,7 +22,6 @@ public class MobCoinReceiveEvent extends Event implements Cancellable {
         this.mobCoinsPlayer = mobCoinsPlayer;
         this.entity = entity;
         this.obtainedAmount = obtainedAmount;
-        this.isCancelled = false;
     }
 
     public Player getPlayer() { return player; }
@@ -41,7 +40,7 @@ public class MobCoinReceiveEvent extends Event implements Cancellable {
     }
 
     @Override
-    public boolean isCancelled() { return false; }
+    public boolean isCancelled() { return isCancelled; }
 
     @Override
     public void setCancelled(boolean cancel) { this.isCancelled = cancel; }

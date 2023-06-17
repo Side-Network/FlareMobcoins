@@ -11,14 +11,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 
-public class DropsFile {
+public class LocaleFile {
 
     private final TMMobCoinsPlugin plugin;
-    private final String file = "drops.yml";
+    private final String file = "locale/en.yml";
     private FileConfiguration dataConfig = null;
     private File configFile = null;
 
-    public DropsFile(TMMobCoinsPlugin plugin) {
+    public LocaleFile(TMMobCoinsPlugin plugin) {
         this.plugin = plugin;
         saveDefaultConfig();
     }
