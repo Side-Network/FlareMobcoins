@@ -15,12 +15,6 @@ commands:
     help: '%pl_prefix% &fPlease use &#F09819"/mobcoins give [player] [amount]"&f.'
     success: "%pl_prefix% &fYou gave &#F09819%pl_mobcoins%&f to %pl_player%."
     received: "%pl_prefix% &fYou received &#F09819%pl_mobcoins% &fmobcoins&f."
-  pay:
-    help: '%pl_prefix% &fPlease use &#F09819"/mobcoins pay [player] [amount]"&f.'
-    success: "%pl_prefix% &fYou payed &#F09819%pl_mobcoins% &fto %pl_player%."
-    received: "%pl_prefix% &fYou received &#F09819%pl_mobcoins% &fmobcoins &ffrom %pl_player%."
-    fail:
-      no_money: "%pl_prefix% &fYou don`t have &#F09819%pl_mobcoins%&f."
   set:
     help: '%pl_prefix% &fPlease use &#F09819"/mobcoins set [player] [amount]"&f.'
     success: "%pl_prefix% &fYou have set %pl_player% &fmobcoins to &#F09819%pl_mobcoins%&f."

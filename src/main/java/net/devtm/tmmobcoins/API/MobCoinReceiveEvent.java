@@ -1,7 +1,5 @@
 package net.devtm.tmmobcoins.API;
 
-import net.devtm.tmmobcoins.util.MobCoinsPlayer;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -12,12 +10,12 @@ public class MobCoinReceiveEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS_LIST = new HandlerList();
     private final Player player;
-    private final MobCoinsPlayer mobCoinsPlayer;
-    private final Entity entity;
+    private final MobcoinsPlayer mobCoinsPlayer;
+    private final String entity;
     private boolean isCancelled = false;
     private double obtainedAmount;
 
-    public MobCoinReceiveEvent(Player player, MobCoinsPlayer mobCoinsPlayer, Entity entity, double obtainedAmount) {
+    public MobCoinReceiveEvent(Player player, MobcoinsPlayer mobCoinsPlayer, String entity, double obtainedAmount) {
         this.player = player;
         this.mobCoinsPlayer = mobCoinsPlayer;
         this.entity = entity;
@@ -28,11 +26,11 @@ public class MobCoinReceiveEvent extends Event implements Cancellable {
 
     public double getObtainedAmount() { return obtainedAmount;  }
 
-    public Entity getEntity() { return entity; }
+    public String getEntity() { return entity; }
 
     public void setDropAmount(double amount) { this.obtainedAmount = amount; }
 
-    public MobCoinsPlayer getMobCoinsPlayer() { return mobCoinsPlayer; }
+    public MobcoinsPlayer getMobCoinsPlayer() { return mobCoinsPlayer; }
 
     @NotNull
     public static HandlerList getHandlerList() {

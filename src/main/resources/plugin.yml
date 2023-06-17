@@ -9,3 +9,5 @@ api-version: 1.13
 commands:
   tmobcoins:
     description: Main command
+  mobcoins:
+    description: Mobcoins shop command

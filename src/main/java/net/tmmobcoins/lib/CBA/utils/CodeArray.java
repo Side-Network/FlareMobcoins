@@ -11,9 +11,6 @@ import java.util.regex.Pattern;
 
 public class CodeArray {
 
-    public CodeArray() {
-    }
-
     public List<String> conditions = new ArrayList<>();
     public List<String> commands = new ArrayList<>();
     public List<String> fallCommands = new ArrayList<>();
@@ -24,6 +21,7 @@ public class CodeArray {
         this.conditions.add(condition);
         return this;
     }
+
     public void addFallCommands(String fallCommands) {
         this.fallCommands.add(fallCommands);
     }
@@ -31,7 +29,6 @@ public class CodeArray {
     public void addCommands(String commands) {
         this.commands.add(commands);
     }
-
 
     public void setConditions(List<String> conditions) {
         this.conditions = conditions;
@@ -45,16 +42,16 @@ public class CodeArray {
         this.commands = commands;
     }
 
-    public boolean checkRequierment(Player player) {
+    public boolean checkRequirement(Player player) {
         boolean test = true;
-        for(String s : conditions) {
-            if(s.toLowerCase().contains("require")) {
+        for (String s : conditions) {
+            if (s.toLowerCase().contains("require")) {
                 Matcher m = Pattern.compile("\\((.*?)\\)").matcher(s);
                 m.find();
                 test = new RequireParser().provideClickType(clickType).getResult(m.group(1).split(";"), player) && test;
             }
         }
-        if(test) {
+        if (test) {
             runCommands(player);
         } else {
             runFallCommands(player);
@@ -63,8 +60,8 @@ public class CodeArray {
     }
 
     public void runCommands(Player player) {
-        if(!commands.isEmpty()) {
-            for(String s : commands) {
+        if (!commands.isEmpty()) {
+            for (String s : commands) {
                 if (s.contains("[") && s.contains("]")) {
                     Lib.LIB.getComponentBasedAction().process(player, s, null);
                 }
@@ -72,8 +69,8 @@ public class CodeArray {
         }
     }
     public void runFallCommands(Player player) {
-        if(!fallCommands.isEmpty()) {
-            for(String s : fallCommands) {
+        if (!fallCommands.isEmpty()) {
+            for (String s : fallCommands) {
                 Lib.LIB.getComponentBasedAction().process(player, s, null);
             }
         }

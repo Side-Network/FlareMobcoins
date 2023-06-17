@@ -1,17 +1,17 @@
 package net.devtm.tmmobcoins.listener;
 
 import net.devtm.tmmobcoins.API.MobCoinReceiveEvent;
+import net.devtm.tmmobcoins.API.MobcoinsPlayer;
 import net.devtm.tmmobcoins.TMMobCoins;
 import net.devtm.tmmobcoins.files.FilesManager;
-import net.devtm.tmmobcoins.util.MobCoinsPlayer;
-import net.devtm.tmmobcoins.util.StorageAccess;
+import net.devtm.tmmobcoins.service.ServiceHandler;
 import net.tmmobcoins.lib.CBA.TMPL;
 import net.tmmobcoins.lib.CBA.utils.CodeArray;
 import net.tmmobcoins.lib.base.VersionCheckers;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.entity.Entity;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,67 +19,49 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class BasicListener implements Listener {
 
-    @EventHandler
-    private void onJoin(PlayerJoinEvent e) {
-        StorageAccess.createAccount(e.getPlayer().getUniqueId());
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void mobcoinsReceiveEvent(MobCoinReceiveEvent event) {
-        if (event.isCancelled())
+        if (event.isCancelled() || event.getEntity() == null)
             return;
-        if (event.getEntity() == null)
-            return;
-        Configuration drops = FilesManager.ACCESS.getDrops().getConfig();
 
-        if (!FilesManager.ACCESS.getDrops().getConfig().contains("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT)))
-            return;
-        List<String> l = new ArrayList<>();
-
-        for (String miniList : drops.getStringList("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT) + ".drop_action")) {
-            l.add(miniList.replace("%pl_mobcoins%", event.getObtainedAmount() + ""));
-        }
-        TMPL tmpl = new TMPL();
-        tmpl.setCode(l);
-        tmpl.process(event.getPlayer());
-
-        if (!drops.contains("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT) + ".drop_value")) return;
-        event.getMobCoinsPlayer().addMobcoins(event.getObtainedAmount());
-        event.getMobCoinsPlayer().uploadPlayer();
+        event.getMobCoinsPlayer().giveMobcoins(event.getObtainedAmount(), false);
     }
 
     @EventHandler
     private void onPlayerKillEntity(EntityDeathEvent event) {
         if (event.getEntity().getKiller() == null)
             return;
-        MobCoinsPlayer tp = StorageAccess.getAccount(event.getEntity().getKiller().getUniqueId());
-        Configuration drops = FilesManager.ACCESS.getDrops().getConfig();
-        Entity entity = event.getEntity();
+
+        String configPath = ServiceHandler.SERVICE.getEventService().mobVerify(event);
+        if (configPath == null)
+            return;
+
         Player player = event.getEntity().getKiller();
-        double mobcoins;
-
-        if(drops.contains("entity." + entity.getName().toUpperCase(Locale.ROOT) + ".drop_value"))
-            mobcoins = Double.parseDouble(String.format("%.2f", generateNumber(drops, entity.getName()) * tp.getMultiplier() * FilesManager.ACCESS.getData().getConfig().getDouble("global_multiplier")));
-        else
-            mobcoins = 0;
-
-        MobCoinReceiveEvent eventMobcoins = new MobCoinReceiveEvent(player, tp, entity, mobcoins);
-
-        if(drops.contains("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT) + ".requirement")) {
-            if (!new CodeArray().addConditions(drops.getString("entity." + event.getEntity().getName().toUpperCase(Locale.ROOT) + ".requirement")).checkRequierment(event.getEntity().getKiller()))
-                eventMobcoins.setCancelled(true);
+        MobcoinsPlayer mobcoinsPlayer = ServiceHandler.SERVICE.getDataService().wrapPlayer(player.getUniqueId());
+        if (mobcoinsPlayer == null) {
+            TMMobCoins.PLUGIN.getPlugin().getLogger().log(Level.SEVERE, "The player profile could not be found!");
+            return;
         }
 
+        double amount = FilesManager.ACCESS.getDrops().getDropAmount(event.getEntityType());
+        if (amount > 0) {
+            amount = Double.parseDouble(String.format(
+                    "%.2f",
+                    mobcoinsPlayer.getMultiplier() * amount
+            ));
+        }
+
+        MobCoinReceiveEvent eventMobcoins = new MobCoinReceiveEvent(player, mobcoinsPlayer, configPath, amount);
         Bukkit.getPluginManager().callEvent(eventMobcoins);
     }
 

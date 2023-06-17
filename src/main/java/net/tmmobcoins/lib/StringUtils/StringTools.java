@@ -1,5 +1,8 @@
 package net.tmmobcoins.lib.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StringTools {
 
     public static String[] stringConcatenate(String[] first, String[] second) {
@@ -9,4 +12,9 @@ public class StringTools {
         return addedString;
     }
 
+    public static <T> List<T> createList(T item) {
+        List<T> a = new ArrayList<>();
+        a.add(item);
+        return a;
+    }
 }

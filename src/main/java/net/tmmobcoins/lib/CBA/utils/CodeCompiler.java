@@ -5,19 +5,21 @@ import java.util.List;
 import java.util.Objects;
 
 public class CodeCompiler {
+
     public HashMap<Integer, CodeArray> process(List<String> list) {
         HashMap<Integer, CodeArray> mainStruct  = new HashMap<>();
         int ifCounter = 0;
-        for(int i = 0; i < list.size(); i++) {
-            if(list.get(i).equalsIgnoreCase("if")) {
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).equalsIgnoreCase("if")) {
                 mainStruct.put(ifCounter, new CodeArray());
-                while(!Objects.equals(list.get(i + 1), "do")) {
+                while (!Objects.equals(list.get(i + 1), "do")) {
                     i++;
                     mainStruct.get(ifCounter).addConditions(list.get(i));
                 }
-            } else if(list.get(i).equalsIgnoreCase("do")) {
+            } else if (list.get(i).equalsIgnoreCase("do")) {
                 boolean aa = false;
-                while(!Objects.equals(list.get(i + 1), "end")) {
+                while (!Objects.equals(list.get(i + 1), "end")) {
                     i++;
 
                     if(list.get(i).equalsIgnoreCase("else")) aa = true;
@@ -29,7 +31,7 @@ public class CodeCompiler {
                     }
                 }
                 ifCounter++;
-            } else if(list.get(i).equalsIgnoreCase("end")) {
+            } else if (list.get(i).equalsIgnoreCase("end")) {
 
             } else {
                 mainStruct.put(ifCounter, new CodeArray());
@@ -37,7 +39,8 @@ public class CodeCompiler {
                 ifCounter++;
             }
         }
-    return mainStruct;
+
+        return mainStruct;
     }
 
 }

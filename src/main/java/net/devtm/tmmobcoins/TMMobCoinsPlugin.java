@@ -4,8 +4,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class TMMobCoinsPlugin extends JavaPlugin {
 
-    public MobcoinsAPI mobcoinsAPI;
-
     @Override
     public void onEnable() {
         TMMobCoins.PLUGIN.start(this);

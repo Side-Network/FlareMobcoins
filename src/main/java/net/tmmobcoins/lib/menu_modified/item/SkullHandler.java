@@ -1,4 +1,4 @@
-package net.tmmobcoins.lib.menu.item;
+package net.tmmobcoins.lib.menu_modified.item;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

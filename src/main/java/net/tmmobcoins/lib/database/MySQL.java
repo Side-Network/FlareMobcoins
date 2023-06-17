@@ -1,144 +1,93 @@
 package net.tmmobcoins.lib.database;
 
-import net.tmmobcoins.lib.base.ColorAPI;
-import org.bukkit.Bukkit;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.RowSetFactory;
+import javax.sql.rowset.RowSetProvider;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.logging.Level;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 
 public class MySQL {
 
-    private Connection connection;
-    public SQL sqlIO = new SQL(this);
-    String host;
-    String user;
-    String password;
-    String database;
-    String port;
-    String driver;
+    private static HikariDataSource hikari;
+    private RowSetFactory factory;
 
-    public MySQL(String host, String user, String password, String database, String port, String driver) {
-        this.host = host;
-        this.user = user;
-        this.password = password;
-        this.database = database;
-        this.port = port;
-        this.driver = driver;
-    }
-
-    public Connection getConnection() {
-        return this.connection;
-    }
-
-    public void setConnection() {
-        if (host != null && user != null && password != null && database != null) {
-            this.disconnect();
-            try {
-                if (driver.length() == 0) {
-                    Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &cERROR &7)) &cSQL driver is missing. Use: &fMySql"));
-                } else {
-                    this.connection = DriverManager.getConnection("jdbc:" + driver + "://" + host + ":" + port + "/" + database + "?autoReconnect=true&maxReconnects=10", user, password);
-                    Bukkit.getLogger().log(Level.INFO, ColorAPI.process("&7(( &aDONE &7)) &aConnected successful to &f" + driver));
-                }
-            } catch (Exception var7) {
-                Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &cERROR &7)) &cDatabase connection error. More info: &f" + var7.getMessage()));
-            }
-        }
-
-    }
-
-    public void connect() {
-        if (!this.isConnected()) {
-            if (host.length() == 0) {
-                Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &cERROR &7)) &cDatabase host is blank!"));
-            } else if (user.length() == 0) {
-                Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &cERROR &7)) &cDatabase user is blank!"));
-            } else if (database.length() == 0) {
-                Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &cERROR &7)) &cDatabase database is blank!"));
-            } else if (port.length() == 0) {
-                Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &cERROR &7)) &cDatabase port is blank!"));
-            } else {
-                this.setConnection();
-            }
-        }
-
-    }
-
-    private void disconnect() {
+    public MySQL(String server, String user, String password, String database, String port) {
+        HikariConfig hikariConfig = new HikariConfig();
         try {
-            if (this.isConnected()) {
-                this.connection.close();
-            }
-        } catch (Exception var2) {
-            Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &cERROR &7)) &cDatabase disconnecting error. More info: &f" + var2.getMessage()));
+            Class.forName("com.mysql.jdbc.Driver");
+
+            hikariConfig.setJdbcUrl("jdbc:mysql://" + server + ":" + port + "/" + database + "?verifyServerCertificate=false&useSSL=false&useUnicode=true&characterEncoding=utf8");
+            hikariConfig.setUsername(user);
+            hikariConfig.setPassword(password);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
-        this.connection = null;
+        hikari = new HikariDataSource(hikariConfig);
     }
 
     public boolean isConnected() {
-        if (this.connection != null) {
-            try {
-                return !this.connection.isClosed();
-            } catch (Exception var2) {
-            }
-        }
-
-        return false;
+        return hikari.isRunning();
     }
 
-    public boolean update(String command) {
-        if (command == null) {
-            return false;
-        } else {
-            boolean result = false;
-            this.connect();
+    public PreparedStatement prepareStatement(String query, String... vars) throws SQLException {
+        PreparedStatement statement = hikari.getConnection().prepareStatement(query);
 
-            try {
-                if (this.connection != null) {
-                    Statement statement = this.connection.createStatement();
-                    statement.executeUpdate(command);
-                    statement.close();
-                    result = true;
-                }
-            } catch (Exception var5) {
-                String message = var5.getMessage();
-                if (message != null) {
-                    Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &4SQL ERROR &7)) &cUnable to send an update to the database more info:"));
-                    Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &4SQL ERROR &7)) &cCommand: " + command));
-                    Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &4SQL ERROR &7)) &cError: " + message));
-                }
+        if (vars.length > 0) {
+            for (int i = 1; i < vars.length + 1; i++) {
+                if (!query.contains("?"))
+                    break;
+
+                if (vars[i - 1].equalsIgnoreCase("$TIMe"))
+                    statement.setTimestamp(i, new Timestamp(System.currentTimeMillis()));
+                else
+                    statement.setString(i, vars[i - 1]);
             }
-
-            this.disconnect();
-            return result;
         }
+
+        return statement;
     }
 
-    public ResultSet query(String command) {
-        if (command == null) {
-            return null;
-        } else {
-            this.connect();
-            ResultSet set = null;
+    public HikariDataSource getDatabase() {
+        return hikari;
+    }
 
-            try {
-                if (this.connection != null) {
-                    Statement statement = this.connection.createStatement();
-                    set = statement.executeQuery(command);
-                }
-            } catch (Exception var4) {
-                if (var4.getMessage() != null) {
-                    Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &4SQL ERROR &7)) &cUnable to query the database more info:"));
-                    Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &4SQL ERROR &7)) &cCommand: " + command));
-                    Bukkit.getLogger().log(Level.SEVERE, ColorAPI.process("&7(( &4SQL ERROR &7)) &cError: " + var4.getMessage()));
-                }
+    private CachedRowSet getCachedRowSet() throws SQLException {
+        if (factory == null)
+            factory = RowSetProvider.newFactory();
+
+        return factory.createCachedRowSet();
+    }
+
+    public synchronized ResultSet execute(final PreparedStatement statement, boolean needReturn) throws SQLException {
+        CachedRowSet cachedSet = null;
+
+        try {
+            if (needReturn) {
+                cachedSet = getCachedRowSet();
+                cachedSet.populate(statement.executeQuery());
             }
 
-            return set;
+            statement.execute();
+        } finally {
+            if (statement != null)
+                statement.close();
+            if (statement.getConnection() != null)
+                statement.getConnection().close();
         }
+
+        if (needReturn)
+            return cachedSet;
+
+        return null;
+    }
+
+    public void close() {
+        hikari.close();
     }
 }

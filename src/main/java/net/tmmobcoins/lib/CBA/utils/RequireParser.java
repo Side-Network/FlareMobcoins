@@ -1,5 +1,7 @@
 package net.tmmobcoins.lib.CBA.utils;
 
+import net.devtm.tmmobcoins.API.MobcoinsPlayer;
+import net.devtm.tmmobcoins.service.ServiceHandler;
 import net.tmmobcoins.lib.Lib;
 import net.tmmobcoins.lib.base.ColorAPI;
 import net.tmmobcoins.lib.base.MessageHandler;
@@ -29,18 +31,25 @@ public class RequireParser {
             case "permission":
                 return player.hasPermission(arguments[1]);
             case "xp":
-                if (player.getLevel() >= Integer.parseInt(arguments[1])) {
+                return player.getLevel() >= Integer.parseInt(arguments[1]);
+            case "mobcoins":
+                MobcoinsPlayer mobcoinsPlayer = ServiceHandler.SERVICE.getDataService().wrapPlayer(player.getUniqueId());
+                if (mobcoinsPlayer.getMobcoins() >= Double.parseDouble(arguments[1])) {
+                    if (arguments.length == 3 &&
+                            arguments[2].equalsIgnoreCase("remove"))
+                        mobcoinsPlayer.removeMobcoins(Double.parseDouble(arguments[1]));
                     return true;
                 }
-                break;
+                return false;
             case "!permission":
                 return !player.hasPermission(arguments[1]);
             case "click_type":
-                if(clickType != null)
+                if (clickType != null)
                     return ClickType.valueOf(arguments[1]).equals(clickType);
-                else return true;
+                else
+                    return true;
         }
-        Lib.LIB.getPlugin().getLogger().log(Level.WARNING, "We found a problem trying to compile you`re requirement: " + arguments[0]);
+        Lib.LIB.getPlugin().getLogger().log(Level.WARNING, "We found a problem trying to compile your requirement: " + arguments[0]);
         return false;
     }
 
@@ -59,13 +68,13 @@ public class RequireParser {
                     return Integer.parseInt(op1) <= Integer.parseInt(op2);
             }
         } catch (Exception e) {
-            Lib.LIB.getPlugin().getLogger().log(Level.INFO, ColorAPI.process("We found a problem trying to compile you`re expression: "));
+            Lib.LIB.getPlugin().getLogger().log(Level.INFO, ColorAPI.process("We found a problem trying to compile your expression: "));
         }
         return false;
     }
+
     public RequireParser provideClickType(ClickType clickType) {
         this.clickType = clickType;
         return this;
     }
-
 }
