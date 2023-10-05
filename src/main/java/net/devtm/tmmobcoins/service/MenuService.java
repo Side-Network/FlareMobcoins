@@ -9,7 +9,6 @@ import net.tmmobcoins.lib.CBA.TMPL;
 import net.tmmobcoins.lib.menu_modified.GUI;
 import net.tmmobcoins.lib.menu_modified.Menu;
 import net.tmmobcoins.lib.menu_modified.item.ItemHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -128,9 +127,11 @@ public class MenuService {
     }
 
     private void generateItems(String s, int which) {
-        List<UUID> toDelete = new ArrayList<>(GUI.menuHolder.keySet());
-        for (UUID uuid : toDelete)
-            GUI.menuHolder.get(uuid).deleteInventory();
+        if (which != 3) {
+            List<UUID> toDelete = new ArrayList<>(GUI.menuHolder.keySet());
+            for (UUID uuid : toDelete)
+                GUI.menuHolder.get(uuid).deleteInventory();
+        }
 
         FileConfiguration shop = Utils.readConfig("shop/" + s + ".yml");
         if (which == 1 || which == 3)

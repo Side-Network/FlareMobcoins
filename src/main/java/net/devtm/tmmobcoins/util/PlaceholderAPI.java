@@ -50,12 +50,12 @@ public class PlaceholderAPI extends PlaceholderExpansion {
             return String.valueOf(ServiceHandler.SERVICE.getDataService().wrapPlayer(p.getUniqueId()).getMobcoins());
         if (params.contains("get_commas_mobcoins"))
             return String.format("%,.2f", ServiceHandler.SERVICE.getDataService().wrapPlayer(p.getUniqueId()).getMobcoins());
-        if (params.contains("get_formmated_mobcoins")) {
+        if (params.contains("get_formatted_mobcoins")) {
             double mobcoins = ServiceHandler.SERVICE.getDataService().wrapPlayer(p.getUniqueId()).getMobcoins();
-            if (mobcoins < 1000.0D)
-                return mobcoins + "";
-            int exp = (int)(Math.log(mobcoins) / Math.log(1000.0D));
             DecimalFormat format = new DecimalFormat("0.#");
+            if (mobcoins < 1000.0D)
+                return format.format(mobcoins);
+            int exp = (int)(Math.log(mobcoins) / Math.log(1000.0D));
             String value = format.format(mobcoins / Math.pow(1000.0D, exp));
             return String.format("%s%c", value, "kMBT".charAt(exp - 1));
         }

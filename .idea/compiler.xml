@@ -10,10 +10,15 @@
         <module name="RedstoneCore" />
         <module name="TMCore" />
         <module name="TMTokens" />
-        <module name="TMMobcoins" />
         <module name="TMparkour" />
         <module name="hub-limitter" />
       </profile>
     </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="FlareMobcoins" options="-proc:none" />
+      <module name="TMMobcoins" options="-proc:none" />
+    </option>
   </component>
 </project>
