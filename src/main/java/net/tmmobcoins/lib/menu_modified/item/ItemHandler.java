@@ -9,6 +9,7 @@ import net.tmmobcoins.lib.CBA.TMPL;
 import net.tmmobcoins.lib.CBA.utils.CodeArray;
 import net.tmmobcoins.lib.base.MessageHandler;
 import net.tmmobcoins.lib.base.VersionCheckers;
+import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -196,7 +197,7 @@ public class ItemHandler {
             if (this.material.contains("[HEAD]")) {
                 this.item = SkullHandler.getHeadFromValue(this.material.replace("[HEAD] ", ""));
             } else {
-                this.item = new ItemStack(((XMaterial)XMaterial.matchXMaterial(this.material).get()).parseMaterial());
+                this.item = new ItemStack(Material.getMaterial(this.material.toUpperCase()));
             }
         ItemMeta meta = this.item.getItemMeta();
         meta.setDisplayName(customPlaceholders(MessageHandler.chat(this.displayName).placeholderAPI(this.player).toStringColor()));

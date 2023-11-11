@@ -9,6 +9,7 @@ import net.tmmobcoins.lib.StringUtils.StringTools;
 import net.tmmobcoins.lib.base.ColorAPI;
 import net.tmmobcoins.lib.menu_modified.item.ItemHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -62,6 +63,11 @@ public class Menu {
             if (menuItem.size() == 1) {
                 ItemHandler ih = menuItem.get(0);
                 if (ih != null) {
+                    if (Material.getMaterial(ih.material) == null) {
+                        System.out.println("Couldn't get material for " + ih.material);
+                        continue;
+                    }
+
                     this.inventory.setItem(content.getKey(), ih.build());
                     this.itemsInMenu.put(content.getKey(), ih);
                 }
