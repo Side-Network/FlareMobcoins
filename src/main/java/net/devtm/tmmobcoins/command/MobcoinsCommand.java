@@ -1,5 +1,7 @@
 package net.devtm.tmmobcoins.command;
 
+import net.devtm.tmmobcoins.API.MobCoinWithdrawEvent;
+import net.devtm.tmmobcoins.API.MobcoinsPlayer;
 import net.devtm.tmmobcoins.TMMobCoins;
 import net.devtm.tmmobcoins.files.FilesManager;
 import net.devtm.tmmobcoins.service.ServiceHandler;
@@ -21,7 +23,10 @@ public class MobcoinsCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length < 1) {
-            help(commandSender);
+            if (!(commandSender instanceof Player player))
+                return true;
+            ServiceHandler.SERVICE.getMenuService()
+                    .openMenu(player, FilesManager.ACCESS.getConfig().getConfig().getString("shop.main_shop"));
         } else {
             switch (args[0].toLowerCase(Locale.ROOT)) {
                 case "reload":
@@ -208,6 +213,41 @@ public class MobcoinsCommand implements CommandExecutor, TabCompleter {
                         commandSender.sendMessage(MessageHandler.message("commands.balance.help").prefix().toStringColor());
                     }
                     break;
+                case "withdraw":
+                    if (!commandSender.hasPermission("tmmobcoins.command.withdraw")) {
+                        commandSender.sendMessage(MessageHandler.message("basic.no_permission").prefix().toStringColor());
+                        return true;
+                    }
+                    if (!(commandSender instanceof Player player))
+                        return true;
+                    if (args.length == 2) {
+                        try {
+                            int amount = Integer.parseInt(args[1]);
+
+                            MobcoinsPlayer mobcoinsPlayer = ServiceHandler.SERVICE.getDataService().wrapPlayer(player.getUniqueId());
+                            if (amount < 1 || mobcoinsPlayer.getMobcoins() < amount) {
+                                commandSender.sendMessage(MessageHandler.message("commands.withdraw.invalid_amount").toStringColor());
+                                return true;
+                            }
+
+                            mobcoinsPlayer.removeMobcoins(amount);
+
+                            player.getInventory().addItem(Utils.getMobCoinItem(player.getName(), amount));
+
+                            commandSender.sendMessage(MessageHandler.message("commands.withdraw.success").prefix()
+                                    .replace("%mobcoins%", String.valueOf(amount))
+                                    .placeholderAPI(commandSender).toStringColor());
+
+                            MobCoinWithdrawEvent withdrawEvent = new MobCoinWithdrawEvent(player, mobcoinsPlayer, amount);
+                            Bukkit.getPluginManager().callEvent(withdrawEvent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            commandSender.sendMessage(MessageHandler.message("commands.withdraw.help").prefix().toStringColor());
+                        }
+                    } else {
+                        commandSender.sendMessage(MessageHandler.message("commands.withdraw.help").prefix().toStringColor());
+                    }
+                    break;
                 case "help":
                     help(commandSender);
                     break;
@@ -219,15 +259,13 @@ public class MobcoinsCommand implements CommandExecutor, TabCompleter {
 
     private void help(CommandSender commandSender) {
         if (!commandSender.hasPermission("tmmobcoins.command.help")) {
-            commandSender.sendMessage(MessageHandler.chat("\n  &7(v" + TMMobCoins.PLUGIN.getPlugin().getDescription().getVersion() + ")").toStringColor());
-            commandSender.sendMessage(MessageHandler.message("basic.no_permission").replace("%pl_prefix%", "").toStringColor());
-            commandSender.sendMessage("\n");
+            commandSender.sendMessage(MessageHandler.message("basic.no_permission").prefix().toStringColor());
         } else {
             commandSender.sendMessage(MessageHandler
                     .chat("\n  <GRADIENT:#FFC837-#FFC837>TMMobcoins</GRADIENT> &7(v" + TMMobCoins.PLUGIN.getPlugin().getDescription().getVersion() + ")\n \n  &f&nArguments&f: &7[] Required, () Optional." +
-                            "\n \n  &#f7971e▸ &7/tmobcoins give [player] [amount]\n  &#f9a815▸ &7/tmobcoins set [player] [amount]" +
-                            "\n  &#fab011▸ &7/tmobcoins remove [player] [amount]\n  &#fcb90d▸ &7/tmobcoins balance (player)\n  &#fdc109▸ &7/tmobcoins reload <files/database/all> " +
-                            "\n \n  &#17F7C1▸ &7/tmobcoins check &#17f7c1[L&#17f6c4e&#16f5c6a&#16f4c9r&#16f4cbn &#16f3cem&#15f2d1o&#15f1d3r&#15f0d6e &#14efd8a&#14eedbb&#14edddo&#14ede0u&#13ece3t &#13ebe5t&#13eae8h&#12e9eai&#12e8eds &#12e7f0p&#11e6f2l&#11e6f5u&#11e5f7g&#11e4fai&#10e3fcn&#10e2ff]\n")
+                            "\n \n  &#f7971e▸ &7/mobcoins give [player] [amount]\n  &#f9a815▸ &7/mobcoins set [player] [amount]" +
+                            "\n  &#fab011▸ &7/mobcoins remove [player] [amount]\n  &#fcb90d▸ &7/mobcoins balance (player)\n  &#fdc109▸ &7/mobcoins reload <files/database/all> " +
+                            "\n \n  &#17F7C1▸ &7/mobcoins check &#17f7c1[L&#17f6c4e&#16f5c6a&#16f4c9r&#16f4cbn &#16f3cem&#15f2d1o&#15f1d3r&#15f0d6e &#14efd8a&#14eedbb&#14edddo&#14ede0u&#13ece3t &#13ebe5t&#13eae8h&#12e9eai&#12e8eds &#12e7f0p&#11e6f2l&#11e6f5u&#11e5f7g&#11e4fai&#10e3fcn&#10e2ff]\n")
                     .toStringColor());
 
             commandSender.sendMessage(MessageHandler.chat("\n\n&7&oNote: This plugin is still in the beta stage, if any bugs please report them on our discord server or direct message me on discord (MaikyDev#5343) or make a issues on github! You can find those links on our website!").toStringColor());
@@ -240,26 +278,28 @@ public class MobcoinsCommand implements CommandExecutor, TabCompleter {
 
         switch (args.length) {
             case 1:
-                for (String s : Arrays.asList("give", "set", "remove", "balance", "help", "multiplier"))
+                for (String s : Arrays.asList("give", "set", "remove", "balance", "help", "multiplier", "withdraw"))
                     if (sender.hasPermission("tmmobcoins.command." + s))
                         completions.add(s);
                 break;
             case 2:
-                if (args[0].equalsIgnoreCase("multiplier"))
+                if (args[0].equalsIgnoreCase("multiplier") && sender.hasPermission("tmmobcoins.command.multiplier"))
                     completions.addAll(Arrays.asList("set", "reset", "global"));
+                else if (args[0].equalsIgnoreCase("withdraw"))
+                    completions.add("[amount]");
                 else if (!args[0].equalsIgnoreCase("help"))
                     Bukkit.getOnlinePlayers().forEach(pl -> completions.add(pl.getName()));
                 break;
             case 3:
-                if (args[0].equalsIgnoreCase("multiplier"))
+                if (args[0].equalsIgnoreCase("multiplier") && sender.hasPermission("tmmobcoins.command.multiplier"))
                     if (args[1].equalsIgnoreCase("global"))
                         completions.add("[amount]");
                     else
                         Bukkit.getOnlinePlayers().forEach(pl -> completions.add(pl.getName()));
-                else if (!args[0].equalsIgnoreCase("help"))
+                else if (!args[0].equalsIgnoreCase("help") && sender.hasPermission("tmmobcoins.command." + args[0]))
                     completions.add("[amount]");
             case 4:
-                if (args[0].equalsIgnoreCase("multiplier"))
+                if (args[0].equalsIgnoreCase("multiplier") && sender.hasPermission("tmmobcoins.command.multiplier"))
                     completions.add("[amount]");
         }
 

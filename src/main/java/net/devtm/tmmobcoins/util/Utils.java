@@ -1,15 +1,22 @@
 package net.devtm.tmmobcoins.util;
 
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import net.devtm.tmmobcoins.TMMobCoins;
 import net.devtm.tmmobcoins.files.FilesManager;
+import net.tmmobcoins.lib.base.ColorAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public enum Utils {
@@ -65,5 +72,52 @@ public enum Utils {
 
     public static FileConfiguration readConfig(Path file) {
         return YamlConfiguration.loadConfiguration(new File(file.toString()));
+    }
+
+    public static ItemStack getMobCoinItem(String createdBy, double amount) {
+        Material mat = Material.getMaterial(
+                FilesManager.ACCESS.getConfig().getConfig().getString("withdraw-item.material", "STONE")
+        );
+        if (mat == null)
+            mat = Material.STONE;
+
+        ItemStack item = new ItemStack(mat);
+        ItemMeta meta = item.getItemMeta();
+
+        DecimalFormat df = new DecimalFormat("#,###.##");
+        String amountParsed = df.format(amount);
+
+        meta.setDisplayName(ColorAPI.process(
+                FilesManager.ACCESS.getConfig().getConfig().getString("withdraw-item.name", "Mobcoins")
+                        .replace("%amount%", amountParsed)
+                        .replace("%created-by%", createdBy)
+        ));
+
+        List<String> lore = new ArrayList<>();
+        for (String line : FilesManager.ACCESS.getConfig().getConfig().getStringList("withdraw-item.lore")) {
+            lore.add(ColorAPI.process(line
+                    .replace("%amount%", amountParsed)
+                    .replace("%created-by%", createdBy)
+            ));
+        }
+        meta.setLore(lore);
+
+        item.setItemMeta(meta);
+
+        NBTItem nbtItem = new NBTItem(item);
+        nbtItem.setDouble("mobcoins-amount", amount);
+
+        return nbtItem.getItem();
+    }
+
+    private static Material mobCoinItemMaterial = null;
+
+    public static Material getMobCoinItemMaterial() {
+        if (mobCoinItemMaterial == null)
+            mobCoinItemMaterial = Material.getMaterial(
+                    FilesManager.ACCESS.getConfig().getConfig().getString("withdraw-item.material", "STONE")
+            );
+
+        return mobCoinItemMaterial;
     }
 }

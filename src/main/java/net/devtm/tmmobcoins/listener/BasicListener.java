@@ -1,28 +1,32 @@
 package net.devtm.tmmobcoins.listener;
 
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import net.devtm.tmmobcoins.API.MobCoinReceiveEvent;
+import net.devtm.tmmobcoins.API.MobCoinRedeemEvent;
 import net.devtm.tmmobcoins.API.MobcoinsPlayer;
 import net.devtm.tmmobcoins.TMMobCoins;
 import net.devtm.tmmobcoins.files.FilesManager;
 import net.devtm.tmmobcoins.service.ServiceHandler;
-import net.tmmobcoins.lib.CBA.TMPL;
-import net.tmmobcoins.lib.CBA.utils.CodeArray;
+import net.devtm.tmmobcoins.util.Utils;
+import net.tmmobcoins.lib.base.MessageHandler;
 import net.tmmobcoins.lib.base.VersionCheckers;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.logging.Level;
@@ -75,6 +79,38 @@ public class BasicListener implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    public void onMobCoinRedeem(PlayerInteractEvent event) {
+        if (!event.hasItem() || event.getHand() != EquipmentSlot.HAND || (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK))
+            return;
+
+        //noinspection DataFlowIssue
+        ItemStack item = event.getItem().clone();
+        if (item.getType() != Utils.getMobCoinItemMaterial())
+            return;
+
+        NBTItem nbtItem = new NBTItem(item);
+        if (!nbtItem.hasTag("mobcoins-amount"))
+            return;
+
+        double amount = nbtItem.getDouble("mobcoins-amount");
+        Player player = event.getPlayer();
+        item.setAmount(1);
+        player.getInventory().removeItem(item);
+
+        MobcoinsPlayer mobcoinsPlayer = ServiceHandler.SERVICE.getDataService().wrapPlayer(player.getUniqueId());
+        mobcoinsPlayer.giveMobcoins(amount, true);
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+
+        player.sendMessage(MessageHandler.message("redeem-success").prefix()
+                .replace("%amount%", String.valueOf(amount))
+                .placeholderAPI(player).toStringColor()
+        );
+
+        MobCoinRedeemEvent withdrawEvent = new MobCoinRedeemEvent(player, mobcoinsPlayer, amount);
+        Bukkit.getPluginManager().callEvent(withdrawEvent);
     }
 
     private double generateNumber(@NotNull Configuration config, @NotNull String entityName) {

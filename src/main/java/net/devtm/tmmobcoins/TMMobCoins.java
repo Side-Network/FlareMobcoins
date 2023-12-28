@@ -3,7 +3,6 @@ package net.devtm.tmmobcoins;
 import net.devtm.tmmobcoins.command.MobcoinsCommand;
 import net.devtm.tmmobcoins.files.FilesManager;
 import net.devtm.tmmobcoins.listener.BasicListener;
-import net.devtm.tmmobcoins.listener.ShopCommand;
 import net.devtm.tmmobcoins.service.ServiceHandler;
 import net.devtm.tmmobcoins.util.CustomCBA;
 import net.devtm.tmmobcoins.util.PlaceholderAPI;
@@ -78,7 +77,7 @@ public enum TMMobCoins {
 
     public void commandsSetup() {
         //noinspection ConstantConditions
-        plugin.getCommand("tmobcoins").setExecutor(new MobcoinsCommand());
+        plugin.getCommand("mobcoins").setExecutor(new MobcoinsCommand());
     }
 
     public void startStorage() {
@@ -124,7 +123,6 @@ public enum TMMobCoins {
     private void registerListener() {
         final Listener[] listeners = new Listener[]{
                 new BasicListener(),
-                new ShopCommand(),
         };
 
         Arrays.stream(listeners)
